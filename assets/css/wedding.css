@@ -1,0 +1,2268 @@
+.opening-screen {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 14px;
+  padding: 32px 24px;
+  text-align: center;
+  background: var(--ivory);
+  transition:
+    opacity 900ms ease,
+    visibility 900ms ease;
+}
+/* lớp phủ họa tiết lá phía sau nội dung màn mở thiệp */
+.opening-screen::before {
+  position: absolute;
+  z-index: -1; /* nằm dưới phong bì và chữ, trên nền ivory */
+  inset: 0;
+  content: "";
+  background-color: var(--gold-700);
+  opacity: 0.24;
+  -webkit-mask-image: url("../img/leaf-mask.png");
+  mask-image: url("../img/leaf-mask.png");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: cover;
+  mask-size: cover;
+  pointer-events: none;
+}
+.opening-screen.is-open {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.opening-kicker,
+.eyebrow {
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+}
+
+.opening-title {
+  font-family: var(--font-heading);
+  font-size: clamp(34px, 9vw, 48px);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.envelope {
+  position: relative;
+  width: min(76vw, 280px);
+  aspect-ratio: 1.4;
+  margin-bottom: 12px;
+  background: rgb(154 123 79 / 16%);
+  box-shadow: 0 22px 55px rgb(30 27 24 / 12%);
+  perspective: 800px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  animation: envelope-float 3s ease-in-out infinite;
+}
+
+.envelope:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 6px;
+}
+
+/* sau khi bấm: dừng nhấp nhô (giữ nguyên vị trí), không bấm lại được */
+.envelope.is-opening {
+  animation-play-state: paused;
+  pointer-events: none;
+  filter: drop-shadow(0 0 22px rgb(212 175 90 / 45%));
+  transition: filter 600ms ease;
+}
+
+@keyframes envelope-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.envelope::before,
+.envelope::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  content: "";
+}
+
+.envelope::before {
+  z-index: 0;
+  background:
+    linear-gradient(145deg, transparent 49.5%, rgb(154 123 79 / 22%) 50%) left / 50% 100% no-repeat,
+    linear-gradient(215deg, transparent 49.5%, rgb(154 123 79 / 22%) 50%) right / 50% 100% no-repeat;
+}
+
+.envelope::after {
+  z-index: 2;
+  background:
+    linear-gradient(35deg, rgb(250 246 239 / 96%) 49.5%, transparent 50%) left / 50% 100% no-repeat,
+    linear-gradient(-35deg, rgb(237 228 212 / 96%) 49.5%, transparent 50%) right / 50% 100% no-repeat;
+}
+
+/* lá thư nằm giữa mặt sau và mặt trước của phong bì */
+.envelope-letter {
+  position: absolute;
+  z-index: 1;
+  inset: 8% 12% 30%;
+  overflow: hidden;
+  background: var(--ivory);
+  box-shadow:
+    0 0 0 3px var(--ivory),
+    0 0 0 4px rgb(154 123 79 / 45%),
+    0 6px 18px rgb(30 27 24 / 18%);
+  transition: transform 750ms cubic-bezier(0.22, 0.8, 0.2, 1) 380ms;
+}
+
+.envelope-letter img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+}
+
+.envelope-flap {
+  position: absolute;
+  z-index: 3;
+  inset: 0 0 auto;
+  height: 60%;
+  background: rgb(154 123 79 / 16%);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: top;
+  transition:
+    transform 650ms ease,
+    z-index 0s 325ms; /* lật quá nửa thì chui xuống sau lá thư */
+}
+
+.wax-seal {
+  position: absolute;
+  z-index: 4;
+  top: 48%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+  -webkit-mask-image: url("../img/double-happiness-mask.png");
+  mask-image: url("../img/double-happiness-mask.png");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  background-color: var(--gold-deep);
+  transition:
+    opacity 280ms ease,
+    transform 280ms ease;
+}
+
+/* ===== hiệu ứng mở: dấu mờ đi -> nắp lật -> thư trượt lên ===== */
+.envelope.is-opening .wax-seal {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.6);
+}
+
+.envelope.is-opening .envelope-flap {
+  z-index: 0;
+  transform: rotateX(180deg);
+  transition-delay: 120ms, 445ms;
+}
+
+.envelope.is-opening .envelope-letter {
+  transform: translateY(-62%);
+}
+
+.opening-hint {
+  color: rgb(30 27 24 / 65%);
+  font-size: 12px;
+  animation: hint-blink 2.4s ease-in-out infinite;
+}
+
+@keyframes hint-blink {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.music-toggle {
+  position: fixed;
+  z-index: 40;
+  right: calc(4px + env(safe-area-inset-right));
+  bottom: calc(4px + env(safe-area-inset-bottom));
+  display: grid;
+  width: 32px;
+  aspect-ratio: 1;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--gold-200);
+  border-radius: 50%;
+  color: var(--gold-100);
+  background: var(--gold-700);
+  box-shadow: 0 2px 8px rgb(30 27 24 / 35%);
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: scale(0.8);
+  transition:
+    opacity 250ms ease,
+    transform 250ms ease,
+    visibility 250ms;
+}
+
+body:not(.is-closed) .music-toggle {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: scale(1);
+}
+
+.music-toggle:hover {
+  transform: scale(1.08);
+}
+
+.music-toggle:active {
+  transform: scale(0.94);
+}
+
+.music-toggle span {
+  position: relative;
+  z-index: 1;
+  font-family: Georgia, serif;
+  font-size: 17px;
+  line-height: 1;
+}
+
+.music-toggle.is-playing span {
+  animation: music-note-spin 4s linear infinite;
+}
+
+/* gạch chéo khi đang tắt nhạc */
+.music-toggle::after {
+  position: absolute;
+  width: 18px;
+  height: 1.5px;
+  border-radius: 2px;
+  background: var(--gold-100);
+  box-shadow: 0 0 0 1px var(--gold-700);
+  content: "";
+  transform: rotate(-45deg);
+  transition: opacity 200ms ease;
+}
+
+.music-toggle.is-playing::after {
+  opacity: 0;
+}
+
+.music-toggle:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+@keyframes music-note-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+#invitation-content {
+  width: 100%;
+  max-width: var(--page-width);
+  margin-inline: auto;
+  overflow-x: clip;
+}
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  height: var(--app-h, 100svh);
+  min-height: 560px;
+  color: white;
+  background: var(--ink);
+}
+
+.hero-slides {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  margin: 0;
+}
+
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.hero-slide.is-active {
+  opacity: 1;
+  z-index: 2;
+}
+
+.hero-slide.is-leaving {
+  opacity: 0;
+  z-index: 1;
+}
+
+.hero-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.hero-slides::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: linear-gradient(
+    to bottom,
+    rgb(77 74 71 / 70%) 0%,
+    rgb(77 74 71 / 25%) 25%,
+    rgb(0 0 0 / 15%) 60%,
+    rgb(0 0 0 / 20%) 100%
+  );
+  pointer-events: none;
+}
+
+@media (hover: hover) and (min-width: 721px) {
+  .hero-slide.is-active img {
+    animation: hero-zoom 6.5s ease-out forwards;
+  }
+
+  .hero-slide.is-leaving img {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes hero-zoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.06);
+  }
+}
+
+.hero-warmth {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgb(30 27 24 / 28%) 0%,
+    transparent 18%,
+    transparent 70%,
+    rgb(30 27 24 / 18%) 100%
+  );
+  pointer-events: none;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 28%;
+  background: linear-gradient(
+    to bottom,
+    rgb(250 246 239 / 0%) 0%,
+    rgb(250 246 239 / 35%) 35%,
+    rgb(250 246 239 / 80%) 75%,
+    var(--ivory) 100%
+  );
+  pointer-events: none;
+}
+
+.hero .main-title {
+  position: absolute;
+  z-index: 4;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  max-width: 100%;
+  padding: 0 16px;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 0.15em;
+  white-space: nowrap;
+  color: #fff;
+  font-family: "Corinthia", cursive;
+  font-size: clamp(2.6rem, 13vw, 5.2rem);
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1;
+  text-shadow:
+    0 0 24px rgb(30 27 24 / 65%),
+    0 3px 10px rgb(30 27 24 / 55%),
+    0 1px 2px rgb(30 27 24 / 40%);
+}
+
+.hero .main-title::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -30% -5%;
+  background: radial-gradient(ellipse at center, rgb(30 27 24 / 40%) 0%, rgb(30 27 24 / 15%) 45%, transparent 72%);
+  pointer-events: none;
+}
+
+.hero .title-line-1,
+.hero .title-line-2 {
+  display: block;
+}
+
+/* "We" thấp xuống một chút */
+.hero .title-line-1 {
+  transform: translateY(0.18em);
+  margin-right: 0.8rem;
+}
+
+/* "Got Married" lệch lên trên */
+.hero .title-line-2 {
+  transform: translateY(-0.18em);
+}
+
+.title-line-2 p:first-child {
+  color: var(--gold-200);
+}
+
+.title-line-2 p:last-child {
+  margin-left: 0.3em;
+  font-size: 1rem;
+  font-family: "Corinthia", cursive;
+  opacity: 0.8;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  white-space: normal;
+  text-shadow: 0 1px 10px rgb(30 27 24 / 70%);
+}
+
+.hero .detail-content {
+  position: absolute;
+  z-index: 4;
+  left: 0;
+  bottom: 6%;
+  width: 100%;
+  padding: 0 14px;
+  display: grid;
+  /* Hai cột bên bằng nhau tuyệt đối, cột giữa luôn nằm đúng tâm. */
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: end;
+  column-gap: 12px;
+  color: var(--gold-700);
+  text-shadow: none;
+}
+
+.hero .hn-groom,
+.hero .hn-bride {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding-bottom: 0.5rem;
+}
+
+.hero .hn-groom {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.hero .hn-bride {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.hero .hn-groom span:first-child,
+.hero .hn-bride span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Antonio", sans-serif;
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.hero .hn-groom span:first-child::after,
+.hero .hn-bride span:first-child::before {
+  content: "";
+  width: 18px;
+  height: 1px;
+  background: var(--black-800);
+}
+
+.hero .hn-groom span:first-child::before {
+  content: none;
+}
+
+.hero .hn-bride span:first-child::after {
+  content: none;
+}
+
+.hero .hn-groom span:first-child::after {
+  margin-left: -0.32em;
+}
+
+.hero .hn-groom span:last-child,
+.hero .hn-bride span:last-child {
+  font-family: "Corinthia", cursive;
+  font-size: clamp(1.3rem, 5.6vw, 1.9rem);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.hero .hn-main {
+  --hn-main-number-size: clamp(3rem, 14vw, 3.8rem);
+  --hn-main-gradient-height: calc(var(--hn-main-number-size) + 1rem + 4px);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 0 16px;
+  line-height: 1;
+  font-family: "Antonio", sans-serif;
+  font-weight: 700;
+  border-left: 1px solid rgb(17 17 17 / 30%);
+  border-right: 1px solid rgb(17 17 17 / 30%);
+  filter: none;
+}
+
+.hero .hn-main span {
+  background-image: linear-gradient(
+    to bottom,
+    var(--gold-700) 0%,
+    color-mix(in srgb, var(--gold-700) 70%, #0a0a0a) 55%,
+    color-mix(in srgb, var(--gold-700) 40%, #141414) 100%
+  );
+  background-size: 100% var(--hn-main-gradient-height);
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.hero .hn-main span:first-child {
+  font-size: var(--hn-main-number-size);
+  background-position: center top;
+}
+
+.hero .hn-main span:last-child {
+  margin-top: 4px;
+  font-size: 1rem;
+  letter-spacing: 0.4em;
+  padding-left: 0.4em;
+  background-position: center calc(0px - var(--hn-main-number-size) - 4px);
+}
+
+@media (max-width: 360px) {
+  .hero .detail-content {
+    padding: 0 12px;
+    column-gap: 8px;
+  }
+
+  .hero .hn-main {
+    padding: 0 10px;
+  }
+}
+
+@keyframes zoom-breathe {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.12);
+  }
+}
+
+.button {
+  display: inline-flex;
+  min-height: 46px;
+  justify-content: center;
+  align-items: center;
+  padding: 11px 20px;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: none;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.button-dark {
+  color: var(--ivory);
+  background: var(--ink);
+}
+
+.button-dark:hover {
+  color: var(--ink);
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== confession: ảnh so le, chữ nằm ngoài vùng bị ảnh che ===== */
+.love-letter {
+  overflow: hidden;
+  padding: 0 0 90px;
+  text-align: center;
+  background: transparent;
+}
+
+.confession-wrap {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 420px;
+  margin: 32px auto 0;
+  padding-inline: 4cqw;
+}
+
+.confession-content {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 5cqw;
+}
+
+.confession-content.is-reverse {
+  z-index: 2;
+  flex-direction: row-reverse;
+  margin-top: -14cqw;
+}
+
+.image-confession {
+  flex: 0 0 54%;
+  overflow: hidden;
+  aspect-ratio: 3 / 4.6;
+  background: transparent;
+  --feather: 6%;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0, #000 var(--feather), #000 calc(100% - var(--feather)), transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 var(--feather), #000 calc(100% - var(--feather)), transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0, #000 var(--feather), #000 calc(100% - var(--feather)), transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 var(--feather), #000 calc(100% - var(--feather)), transparent 100%);
+  mask-composite: intersect;
+}
+
+.image-confession img {
+  filter: saturate(0.95) contrast(1.02);
+}
+
+.text-confession {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1.6cqw;
+  min-width: 0;
+  text-align: left;
+}
+
+.confession-content:not(.is-reverse) .text-confession {
+  justify-content: flex-start;
+  padding-top: 10cqw;
+}
+
+.confession-content.is-reverse .text-confession {
+  justify-content: flex-end;
+  padding-bottom: 10cqw;
+}
+
+.text-confession .role {
+  color: var(--gold);
+  font-size: clamp(9px, 2.6cqw, 11px);
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.text-confession .who {
+  font-family: "Corinthia", cursive;
+  font-size: clamp(22px, 7cqw, 32px);
+  font-weight: 400;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.text-confession .who::after {
+  display: block;
+  width: 28px;
+  height: 1px;
+  margin: 8px 0 6px;
+  content: "";
+  background: var(--gold);
+}
+
+.text-confession .story {
+  color: rgb(30 27 24 / 80%);
+  font-family: var(--font-heading);
+  font-size: clamp(13px, 3.7cqw, 16px);
+  font-style: italic;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.block-title {
+  position: relative;
+  width: max-content;
+  margin: 0 auto;
+  font-family: "Corinthia", cursive;
+  font-weight: 400;
+  font-size: 2.6rem;
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.block-title .title-second {
+  transform: translateY(-1rem) translateX(-0.5rem);
+  color: var(--gold-500);
+}
+
+.icon-title-main {
+  margin: 16px auto 8px auto;
+  width: 2.6rem;
+  height: 2.6rem;
+  background-color: #9a7b4f;
+  -webkit-mask-image: url("../icon/design.png");
+  mask-image: url("../icon/design.png");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.album-wrap {
+  --card-w: min(70vw, 19rem);
+  --brush: min(70vw, 30rem);
+  position: relative;
+  width: 100%;
+  height: 60vh;
+  height: max(60svh, calc(var(--card-w) * 1.5 + 5rem));
+}
+
+.component-design {
+  position: absolute;
+  left: 0%;
+  top: -20%;
+  width: var(--brush);
+  height: var(--brush);
+  background-color: #9a7b4f;
+  -webkit-mask-image: url("../icon/brush-blue.png");
+  mask-image: url("../icon/brush-blue.png");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  pointer-events: none;
+}
+
+.album-wrap .gallery {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.album-wrap .cards {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--card-w);
+  height: calc(var(--card-w) * 1.5);
+  margin: 0;
+  padding: 0;
+  transform: translate(-50%, -50%);
+}
+
+.album-wrap .cards li {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--card-w);
+  aspect-ratio: 2 / 3;
+  list-style: none;
+  background-size: cover;
+  background-position: center 20%;
+  background-repeat: no-repeat;
+  border-radius: 0.8rem;
+  box-shadow: 0 14px 34px rgb(30 27 24 / 22%);
+  will-change: transform;
+}
+
+.album-wrap .cards li {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.drag-proxy {
+  position: absolute;
+  visibility: hidden;
+}
+
+@media (min-width: 700px) {
+  html {
+    background: var(--paper-2);
+  }
+
+  #invitation-content {
+    background: var(--ivory);
+    box-shadow: 0 0 60px rgb(58 38 38 / 14%);
+  }
+}
+
+@media (min-width: 700px) {
+  :root {
+    --page-width: 560px;
+  }
+
+  .confession-wrap {
+    max-width: 500px;
+  }
+
+  .confession-content.is-reverse {
+    margin-top: -12cqw;
+  }
+
+  .text-confession .role {
+    font-size: clamp(11px, 2.6cqw, 13px);
+  }
+
+  .text-confession .who {
+    font-size: clamp(32px, 8cqw, 46px);
+  }
+
+  .text-confession .story {
+    font-size: clamp(16px, 3.7cqw, 20px);
+  }
+}
+
+/* ===== Khung viền ảnh chính trong album ===== */
+.album-wrap .cards li {
+  transition: box-shadow 450ms ease;
+}
+
+/* Viền ngoài: kem dày, vàng gold, kem mờ, rồi đổ bóng */
+.album-wrap .cards li.is-active {
+  box-shadow:
+    0 0 0 6px var(--gold-500),
+    0 0 0 7px var(--gold-500, #9a7b4f),
+    0 24px 48px rgb(30 27 24 / 30%);
+}
+
+/* Đường kẻ mảnh nằm trong ảnh */
+.album-wrap .cards li::after,
+.album-wrap .cards li::before {
+  position: absolute;
+  content: "";
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 450ms ease;
+}
+
+.album-wrap .cards li::before {
+  position: absolute;
+  inset: -14px;
+  content: "";
+  border: 1px solid var(--gold-500, #9a7b4f);
+  border-radius: calc(0.8rem + 14px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 450ms ease;
+}
+
+.album-wrap .cards li.is-active::after,
+.album-wrap .cards li.is-active::before {
+  opacity: 1;
+}
+
+/* ===== Họa tiết cỏ hoa phía sau album ===== */
+.album-botanicals {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.botanical {
+  position: absolute;
+  color: var(--gold-500, #9a7b4f);
+  opacity: 0.7;
+  will-change: transform;
+}
+
+.botanical svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Nét luôn mảnh đều nhau dù họa tiết to hay nhỏ */
+.botanical svg * {
+  vector-effect: non-scaling-stroke;
+}
+
+.botanical svg .tint {
+  fill: currentColor;
+  fill-opacity: 0.12;
+}
+
+.botanical svg .solid {
+  fill: currentColor;
+  stroke: none;
+}
+
+@media (max-width: 420px) {
+  .botanical {
+    scale: 0.8;
+  }
+}
+
+.page-leaves {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ===== Thông tin lễ cưới ===== */
+.info-section {
+  padding: 24px 22px 90px;
+  text-align: center;
+}
+
+.info-invite {
+  max-width: 320px;
+  margin: 18px auto 0;
+  color: rgb(30 27 24 / 78%);
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.info-role {
+  display: block;
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+/* --- cặp đôi --- */
+.info-couple {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  max-width: 420px;
+  margin: 32px auto 0;
+}
+
+.info-name {
+  display: block;
+  margin-top: 4px;
+  font-family: "Corinthia", cursive;
+  font-size: clamp(2rem, 9vw, 2.8rem);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.info-amp {
+  color: var(--gold-500);
+  font-family: var(--font-heading);
+  font-size: 30px;
+  font-style: italic;
+}
+
+/* --- ngày cưới --- */
+.info-date {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  margin: 42px auto 0;
+}
+
+.info-weekday {
+  color: var(--gold-500);
+  font-family: "Antonio", sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.5em;
+  padding-left: 0.5em;
+  text-transform: uppercase;
+}
+
+.info-date-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  width: min(100%, 420px);
+}
+
+.info-month,
+.info-year {
+  position: relative;
+  white-space: nowrap;
+  font-family: "Antonio", sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.info-month {
+  justify-self: end;
+}
+
+.info-year {
+  justify-self: start;
+}
+
+/* đường kẻ vàng hai bên số ngày */
+.info-month::after,
+.info-year::before {
+  position: absolute;
+  top: 50%;
+  width: 22px;
+  height: 1px;
+  background: var(--gold-500);
+  content: "";
+}
+
+.info-month::after {
+  left: calc(100% + 8px);
+}
+
+.info-year::before {
+  right: calc(100% + 8px);
+}
+
+.info-day {
+  padding: 0 18px;
+  border-right: 1px solid rgb(154 123 79 / 40%);
+  border-left: 1px solid rgb(154 123 79 / 40%);
+  background: linear-gradient(180deg, var(--gold-400) 0%, var(--gold-600) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  font-family: "Antonio", sans-serif;
+  font-size: clamp(4.6rem, 22vw, 6.2rem);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.info-lunar {
+  color: rgb(30 27 24 / 60%);
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-style: italic;
+}
+
+.info-side {
+  margin: 2px 0 0;
+  font-family: "Corinthia", cursive;
+  font-size: clamp(2.3rem, 11vw, 3rem);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.info-family {
+  margin-top: 6px;
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.info-label {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.venue-address {
+  max-width: none;
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.venue-hint {
+  margin-top: 8px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+/* ===== Hai bên gia đình: một khối chia đôi ===== */
+.info-split {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: 440px;
+  margin: 46px auto 0;
+  border: 1px solid rgb(154 123 79 / 45%);
+  box-shadow: 0 22px 50px rgb(58 38 38 / 22%);
+}
+
+.split-side {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 34px 14px 26px;
+  text-align: center;
+}
+
+.split-side::before {
+  position: absolute;
+  inset: 6px;
+  content: "";
+  pointer-events: none;
+}
+
+.split-side--groom {
+  color: var(--gold-50);
+  background: var(--ink);
+}
+
+.split-side--groom::before {
+  border: 1px solid rgb(230 203 134 / 32%);
+}
+
+.split-side--groom .info-role,
+.split-side--groom .info-label,
+.split-side--groom dt {
+  color: var(--gold-200);
+}
+
+.split-side--groom .venue-address {
+  color: rgb(251 243 220 / 82%);
+}
+
+.split-side--groom .venue-hint {
+  color: rgb(251 243 220 / 60%);
+}
+
+.split-side--groom dd {
+  color: var(--gold-100);
+}
+
+.split-side--groom .split-details {
+  border-color: rgb(230 203 134 / 28%);
+}
+
+.split-side--groom .split-details > div {
+  border-color: rgb(230 203 134 / 18%);
+}
+
+.split-side--groom .venue-pin {
+  border-color: var(--gold-200);
+  color: var(--gold-200);
+  background: transparent;
+}
+
+.split-side--bride {
+  color: var(--ink);
+  background: var(--ivory);
+}
+
+.split-side--bride::before {
+  border: 1px solid rgb(154 123 79 / 28%);
+}
+
+.split-side--bride .info-role,
+.split-side--bride .info-label,
+.split-side--bride dt {
+  color: var(--gold-500);
+}
+
+.split-side--bride .info-side {
+  color: var(--gold-600);
+}
+
+.split-side--bride .venue-address {
+  color: rgb(30 27 24 / 78%);
+}
+
+.split-side--bride .venue-hint {
+  color: rgb(30 27 24 / 60%);
+}
+
+.split-side--bride dd {
+  color: var(--gold-600);
+}
+
+.split-details {
+  width: 100%;
+  margin: 20px 0 0;
+  border-top: 1px solid rgb(154 123 79 / 30%);
+}
+
+.split-details > div {
+  display: grid;
+  gap: 1px;
+  padding: 9px 0;
+  border-bottom: 1px solid rgb(154 123 79 / 20%);
+}
+
+.split-details dt {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.split-details dd {
+  margin: 0;
+  font-family: "Antonio", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+}
+
+.split-addr {
+  margin: 16px 0 20px;
+}
+
+.split-side .venue-pin {
+  margin-top: auto;
+}
+
+.split-side .venue-hint {
+  margin-top: 8px;
+}
+
+.split-amp {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 3px solid var(--ivory);
+  border-radius: 50%;
+  color: var(--ivory);
+  background: var(--gold-500);
+  box-shadow: 0 6px 16px rgb(58 38 38 / 28%);
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-style: italic;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+}
+
+.venue-pin {
+  position: relative;
+  z-index: 3;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border: 1px solid var(--gold-500);
+  border-radius: 50%;
+  color: var(--gold-500);
+  background: var(--ivory);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    color 220ms ease,
+    background-color 220ms ease,
+    translate 220ms ease,
+    scale 220ms ease;
+}
+
+@media (hover: hover) {
+  .venue-pin:hover {
+    color: var(--ivory);
+    background: var(--gold-500);
+    translate: 0 -2px;
+  }
+
+  .split-side--groom .venue-pin:hover {
+    color: var(--ink);
+    background: var(--gold-200);
+  }
+}
+
+.venue-pin:active {
+  scale: 0.94;
+}
+
+.venue-pin::after {
+  position: absolute;
+  inset: -1px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+  animation: pin-pulse 2.4s ease-out infinite;
+}
+
+@keyframes pin-pulse {
+  from {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+@media (hover: hover) {
+  .venue-pin:hover {
+    color: var(--ivory);
+    background: var(--gold-500);
+    transform: translateY(-2px);
+  }
+
+  .split-side--groom .venue-pin:hover {
+    color: var(--ink);
+    background: var(--gold-200);
+  }
+}
+
+.venue-pin:active {
+  transform: scale(0.94);
+}
+
+@media (max-width: 360px) {
+  .info-date-main {
+    gap: 12px;
+  }
+
+  .info-month::after,
+  .info-year::before {
+    display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .info-split {
+    grid-template-columns: 1fr;
+  }
+
+  .split-side {
+    padding: 30px 20px 24px;
+  }
+}
+
+/* ===== Save The Date ===== */
+.countdown-section {
+  padding: 4px;
+  text-align: center;
+}
+
+.count-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  margin: 28px auto 0;
+  padding-bottom: 60px;
+}
+
+.count-wrap .main-image {
+  overflow: visible;
+  border-radius: 0.8rem;
+}
+
+.count-wrap .main-image img {
+  display: block;
+  width: 100%;
+  object-fit: contain;
+  filter: brightness(0.85);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgb(0 0 0 / 60%) 12%, #000 30%);
+  mask-image: linear-gradient(to bottom, transparent 0%, rgb(0 0 0 / 60%) 12%, #000 30%);
+  border-radius: 0.8rem;
+}
+
+.count-wrap .sub-text {
+  position: absolute;
+  left: 50%;
+  top: 56%;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  width: 90%;
+  transform: translateX(-50%);
+  text-align: center;
+  --shade: 1;
+}
+
+/* lớp tối mờ phía sau chữ để chữ nổi lên khỏi ảnh */
+.count-wrap .sub-text::before {
+  position: absolute;
+  inset: -60% -5.5%;
+  z-index: -1;
+  content: "";
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgb(30 27 24 / 45%) 35%,
+    rgb(30 27 24 / 45%) 65%,
+    transparent 100%
+  );
+  opacity: var(--shade);
+  pointer-events: none;
+}
+.count-wrap .sub-text-item {
+  font-family: var(--font-des);
+  font-style: normal;
+  font-weight: 400;
+  font-size: 2.2rem;
+  white-space: nowrap;
+
+  /* vàng champagne ánh kim */
+  background: linear-gradient(180deg, var(--gold-50) 0%, var(--gold-100) 50%, var(--gold-200) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+
+  /* dùng drop-shadow thay text-shadow vì chữ đang trong suốt */
+  filter: drop-shadow(0 1px 2px rgb(20 10 5 / 70%)) drop-shadow(0 0 8px rgb(20 10 5 / 60%));
+}
+
+.count-wrap .sub-image {
+  position: absolute;
+  left: 50%;
+  top: 70%;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  width: 90%;
+  transform: translateX(-50%);
+}
+
+.count-wrap .sub-item {
+  position: relative;
+  isolation: isolate;
+  container-type: inline-size;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 2 / 3;
+  border-radius: 6px;
+  color: var(--ivory);
+  box-shadow:
+    0 0 0 1px rgb(201 162 39 / 45%),
+    0 14px 30px -16px rgb(30 27 24 / 55%);
+}
+
+.count-wrap .sub-item img {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.8) saturate(1.05);
+}
+
+.count-wrap .sub-item::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  background: linear-gradient(180deg, transparent 35%, rgb(30 27 24 / 40%) 62%, rgb(30 27 24 / 88%) 100%);
+  pointer-events: none;
+}
+
+/* TITLE: nằm trên cùng, chữ mờ dần xuống dưới */
+.count-wrap .title-count {
+  position: absolute;
+  top: 50%;
+  transform: translatey(-50%);
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: "Antonio", sans-serif;
+  font-weight: 600;
+  font-size: 30cqw;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-indent: 0.12em;
+  text-transform: uppercase;
+  opacity: 1;
+  background: linear-gradient(180deg, var(--ivory) 0%, rgb(255 255 255 / 18%) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* SỐ: lớn, nằm sát đáy */
+.count-wrap .time-count {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(6px, 8cqw, 12px);
+  display: flex;
+  justify-content: center;
+  font-family: "Antonio", sans-serif;
+  font-weight: 500;
+  font-size: 58cqw;
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--ivory);
+  font-variant-numeric: lining-nums tabular-nums;
+  text-shadow: 0 2px 10px rgb(20 3 3 / 60%);
+}
+
+.count-wrap .time-count .digit {
+  position: relative;
+  display: block;
+  width: 0.56em;
+  height: 1.05em;
+  overflow: hidden;
+  /* mép trên/dưới mờ nhẹ như số của Apple */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18%, #000 82%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 18%, #000 82%, transparent 100%);
+}
+
+.count-wrap .time-count .d {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+}
+
+/* ===== Sóng vỗ trên ảnh confession ===== */
+.image-confession .wave {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 2;
+  height: 34%;
+  pointer-events: none;
+}
+
+.image-confession .wave svg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+}
+
+.image-confession .wave-back path {
+  fill: rgb(230 203 134 / 38%);
+}
+
+.image-confession .wave-front path {
+  fill: rgb(251 241 238 / 78%);
+}
+
+/* ===== Mô tả nhỏ cuối phần đếm ngược ===== */
+.count-note {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  max-width: 320px;
+  margin: 28px auto 0;
+  padding: 0 22px 0;
+  text-align: center;
+}
+
+.count-note-line {
+  display: block;
+  width: 56px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-500), transparent);
+}
+
+.count-note-text {
+  color: rgb(30 27 24 / 78%);
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-style: italic;
+  line-height: 1.55;
+  text-wrap: balance;
+}
+
+.count-note-date {
+  color: var(--gold-500);
+  font-family: "Antonio", sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.4em;
+  text-indent: 0.4em;
+  text-transform: uppercase;
+}
+/* ===== Gửi lời chúc + xác nhận tham dự ===== */
+.rsvp-section {
+  padding: 24px 22px 0;
+  text-align: center;
+}
+
+.rsvp-intro {
+  max-width: 320px;
+  margin: 18px auto 0;
+  color: rgb(30 27 24 / 78%);
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.rsvp-form {
+  display: grid;
+  gap: 16px;
+  width: min(100%, 420px);
+  margin: 30px auto 0;
+  text-align: left;
+}
+
+.rsvp-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.rsvp-field > span,
+.rsvp-choice legend {
+  color: var(--ink-soft);
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.rsvp-field input,
+.rsvp-field select,
+.rsvp-field textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgb(154 123 79 / 45%);
+  border-radius: 0;
+  outline: none;
+  background: rgb(255 255 255 / 45%);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  line-height: 1.4;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.rsvp-field textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.rsvp-field input:focus,
+.rsvp-field select:focus,
+.rsvp-field textarea:focus {
+  border-color: var(--gold-500);
+  box-shadow: 0 0 0 2px rgb(166 124 46 / 14%);
+}
+
+/* hai lựa chọn tham dự dạng nút */
+.rsvp-choice {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.rsvp-choice legend {
+  margin-bottom: 8px;
+  padding: 0;
+}
+
+.rsvp-choice label {
+  position: relative;
+}
+
+.rsvp-choice input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.rsvp-choice span {
+  display: block;
+  padding: 12px 8px;
+  border: 1px solid rgb(154 123 79 / 45%);
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.3;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.rsvp-choice input:checked + span {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--gold-100);
+}
+
+.rsvp-choice input:focus-visible + span {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.rsvp-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  gap: 10px;
+}
+
+.rsvp-row[hidden],
+.rsvp-form[hidden],
+.rsvp-thanks[hidden] {
+  display: none;
+}
+
+/* bẫy bot */
+.rsvp-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.rsvp-submit {
+  justify-self: center;
+  min-width: 190px;
+  margin-top: 6px;
+  padding: 13px 24px;
+  border: 1px solid var(--gold-500);
+  background: var(--ink);
+  color: var(--gold-100);
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    opacity 0.25s ease;
+}
+
+.rsvp-submit:hover,
+.rsvp-submit:focus-visible {
+  background: var(--gold-500);
+  color: var(--ivory);
+}
+
+.rsvp-submit:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.rsvp-status {
+  min-height: 1.5em;
+  text-align: center;
+  color: var(--gold-600);
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-style: italic;
+}
+
+/* ===== Màn cảm ơn ===== */
+.rsvp-thanks {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  padding: 48px 20px 24px;
+  overflow-y: auto;
+  background: rgb(20 17 15 / 62%);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.rsvp-thanks [hidden] {
+  display: none !important;
+}
+
+.rsvp-thanks-card {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  width: min(100%, 380px);
+  margin: auto;
+  gap: 10px;
+  padding: 62px 26px 28px;
+  border: 1px solid var(--gold-300);
+  color: var(--gold-50);
+  background:
+    radial-gradient(ellipse at 50% 0%, rgb(212 175 90 / 26%) 0%, transparent 58%),
+    radial-gradient(ellipse at 50% 100%, rgb(183 110 121 / 16%) 0%, transparent 60%), var(--ink);
+  box-shadow: 0 28px 60px rgb(58 38 38 / 34%);
+}
+
+.rsvp-thanks-card::before {
+  position: absolute;
+  inset: 7px;
+  border: 1px solid rgb(230 203 134 / 35%);
+  content: "";
+  pointer-events: none;
+}
+
+/* bốn góc trang trí */
+.thanks-corner {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--gold-300);
+  pointer-events: none;
+}
+.thanks-corner--tl {
+  top: 13px;
+  left: 13px;
+  border-right: 0;
+  border-bottom: 0;
+}
+.thanks-corner--tr {
+  top: 13px;
+  right: 13px;
+  border-left: 0;
+  border-bottom: 0;
+}
+.thanks-corner--bl {
+  bottom: 13px;
+  left: 13px;
+  border-right: 0;
+  border-top: 0;
+}
+.thanks-corner--br {
+  bottom: 13px;
+  right: 13px;
+  border-left: 0;
+  border-top: 0;
+}
+
+/* con dấu */
+.rsvp-thanks-seal {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border: 3px solid var(--ivory);
+  border-radius: 50%;
+  color: var(--ivory);
+  background: radial-gradient(circle at 35% 28%, var(--gold-300) 0%, var(--gold-600) 80%);
+  box-shadow: 0 8px 22px rgb(30 27 24 / 45%);
+  font-family: var(--font-heading);
+  font-size: 30px;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+}
+
+/* vòng nét đứt xoay quanh con dấu */
+.rsvp-thanks-seal::before {
+  position: absolute;
+  inset: -11px;
+  border: 1px dashed var(--gold-200);
+  border-radius: 50%;
+  content: "";
+  animation: thanks-spin 14s linear infinite;
+}
+
+.rsvp-thanks-seal::after {
+  position: absolute;
+  inset: -3px;
+  border: 1px solid var(--gold-200);
+  border-radius: 50%;
+  content: "";
+  animation: pin-pulse 2.4s ease-out infinite;
+}
+
+@keyframes thanks-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rsvp-thanks-kicker {
+  color: var(--gold-200);
+  font-family: "Antonio", sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.5em;
+  text-indent: 0.5em;
+  text-transform: uppercase;
+}
+
+/* tiêu đề vàng ánh kim, có vệt sáng chạy qua */
+.rsvp-thanks-title {
+  font-family: "Corinthia", cursive;
+  font-size: 3.8rem;
+  font-weight: 400;
+  line-height: 1;
+  background: linear-gradient(
+    100deg,
+    var(--gold-400) 0%,
+    var(--gold-200) 35%,
+    #fff8e1 50%,
+    var(--gold-200) 65%,
+    var(--gold-400) 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: thanks-shimmer 4s linear infinite;
+}
+
+@keyframes thanks-shimmer {
+  from {
+    background-position: 120% 0;
+  }
+  to {
+    background-position: -120% 0;
+  }
+}
+
+/* tên khách */
+.rsvp-thanks-guest {
+  max-width: 100%;
+  color: var(--gold-100);
+  font-family: "Corinthia", cursive;
+  font-size: 2.3rem;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+  text-shadow: 0 2px 14px rgb(212 175 90 / 35%);
+}
+
+.rsvp-thanks-line {
+  display: block;
+  width: 110px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-300), transparent);
+}
+
+.rsvp-thanks-text {
+  max-width: 280px;
+  color: rgb(251 243 220 / 88%);
+  font-family: var(--font-heading);
+  font-size: 1.12rem;
+  font-style: italic;
+  line-height: 1.55;
+  text-wrap: balance;
+}
+
+/* ngày / giờ / khách */
+.rsvp-thanks-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  margin: 10px 0 0;
+  border-block: 1px solid rgb(230 203 134 / 28%);
+}
+
+.rsvp-thanks-meta > div {
+  display: grid;
+  gap: 2px;
+  padding: 12px 4px;
+  text-align: center;
+}
+
+.rsvp-thanks-meta > div + div {
+  border-left: 1px solid rgb(230 203 134 / 22%);
+}
+
+.rsvp-thanks-meta dt {
+  color: var(--gold-200);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.rsvp-thanks-meta dd {
+  margin: 0;
+  color: var(--gold-100);
+  font-family: "Antonio", sans-serif;
+  font-size: 1.3rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+}
+
+.rsvp-thanks-venue {
+  max-width: 270px;
+  color: rgb(251 243 220 / 70%);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* nút */
+.rsvp-thanks-actions {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.rsvp-thanks-cal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 190px;
+  padding: 12px 22px;
+  border: 1px solid var(--gold-200);
+  color: var(--ink);
+  background: linear-gradient(135deg, var(--gold-200) 0%, var(--gold-300) 55%, var(--gold-400) 100%);
+  cursor: pointer;
+  font-family: "Antonio", sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.24em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.rsvp-thanks-cal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgb(0 0 0 / 35%);
+}
+
+.rsvp-thanks-again {
+  padding: 4px 8px;
+  border: 0;
+  color: var(--gold-200);
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-style: italic;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.rsvp-petal {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 8px;
+  height: 12px;
+  border-radius: 80% 0 80% 0;
+  pointer-events: none;
+}
+
+/* ===== Footer ===== */
+.site-footer {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 44px 24px calc(40px + env(safe-area-inset-bottom));
+  text-align: center;
+}
+
+/* đường kẻ vàng mờ dần hai đầu ở phía trên */
+.site-footer::before {
+  width: 140px;
+  height: 1px;
+  margin-bottom: 20px;
+  content: "";
+  background: linear-gradient(90deg, transparent, var(--gold-500), transparent);
+}
+
+.footer-seal {
+  width: 38px;
+  height: 38px;
+  background-color: var(--gold-500);
+  -webkit-mask-image: url("../img/double-happiness-mask.png");
+  mask-image: url("../img/double-happiness-mask.png");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.footer-names {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25em;
+  margin-top: 6px;
+  color: var(--gold-600);
+  font-family: "Corinthia", cursive;
+  font-size: clamp(2.2rem, 10vw, 2.8rem);
+  line-height: 1.1;
+  flex-direction: column;
+}
+
+.footer-amp {
+  color: var(--gold-500);
+  font-family: var(--font-heading);
+  font-size: 0.55em;
+  font-style: italic;
+}
+
+.footer-thanks {
+  color: rgb(30 27 24 / 60%);
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+@media (max-width: 720px), (hover: none) {
+  .image-confession {
+    -webkit-mask-image: none;
+    mask-image: none;
+    border-radius: 6px;
+  }
+  .count-wrap .time-count .digit {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .count-wrap .sub-text-item {
+    filter: none;
+    text-shadow: 0 1px 6px rgb(20 10 5 / 80%);
+  }
+  .album-wrap .cards li {
+    box-shadow: 0 6px 14px rgb(30 27 24 / 22%);
+  }
+}
+
+.page-leaves {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  contain: strict;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* ===== Hai ngày cưới ===== */
+.info-dates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: 420px;
+  margin: 42px auto 0;
+}
+
+.info-dates .info-date {
+  margin: 0;
+  padding: 0 6px;
+  gap: 4px;
+}
+
+.info-dates .info-date + .info-date {
+  border-left: 1px solid rgb(154 123 79 / 40%);
+}
+
+.info-date-label {
+  color: var(--gold-500);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.info-dates .info-weekday {
+  font-size: 0.8rem;
+  letter-spacing: 0.3em;
+  padding-left: 0.3em;
+}
+
+.info-dates .info-day {
+  padding: 0;
+  border: 0;
+  font-size: clamp(3.6rem, 17vw, 4.8rem);
+}
+
+.info-monthyear {
+  font-family: "Antonio", sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.info-time {
+  color: rgb(30 27 24 / 65%);
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-style: italic;
+}
