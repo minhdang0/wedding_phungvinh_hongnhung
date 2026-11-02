@@ -39,13 +39,13 @@ const WEDDING_CONFIG = {
     groom: {
       role: "Chú rể",
       text: "Anh từng nghĩ hạnh phúc còn xa lắm. Cho đến ngày gặp em.",
-      image: "./assets/img/groom.jpg",
+      image: "./assets/img/story-optimized/groom.jpg",
       imageAlt: "Chú rể Hoàng Vinh",
     },
     bride: {
       role: "Cô dâu",
       text: "Chỉ cần một người nắm tay em mỗi sáng thức dậy. Và người ấy, hóa ra, chính là anh.",
-      image: "./assets/img/bride.jpg",
+      image: "./assets/img/story-optimized/bride.jpg",
       imageAlt: "Cô dâu Nguyễn Nhung",
     },
   },
@@ -60,10 +60,10 @@ const WEDDING_CONFIG = {
       alt: "Ảnh cưới",
     },
     countdown: [
-      "./assets/img/hero1.jpg",
-      "./assets/img/hero2.jpg",
-      "./assets/img/hero3.jpg",
-      "./assets/img/hero4.jpg",
+      "./assets/img/hero-optimized/hero1.jpg",
+      "./assets/img/hero-optimized/hero2.jpg",
+      "./assets/img/hero-optimized/hero3.jpg",
+      "./assets/img/hero-optimized/hero4.jpg",
     ],
     gallery: [
       "./assets/img/gallery-optimized/image1.jpg",
