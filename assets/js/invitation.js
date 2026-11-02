@@ -50,15 +50,10 @@ const WEDDING_CONFIG = {
     },
   },
   images: {
-    envelopeLetter: {
-      src: "./assets/img/image18.jpg",
-      alt: "Ảnh cưới",
-    },
     heroSlides: [
       { src: "./assets/img/hero-optimized/hero1.jpg", alt: "Ảnh cưới 1" },
       { src: "./assets/img/hero-optimized/hero2.jpg", alt: "Ảnh cưới 2" },
       { src: "./assets/img/hero-optimized/hero3.jpg", alt: "Ảnh cưới 3" },
-      { src: "./assets/img/hero-optimized/hero4.jpg", alt: "Ảnh cưới 4" },
     ],
     countdownMain: {
       src: "./assets/img/image18.jpg",
