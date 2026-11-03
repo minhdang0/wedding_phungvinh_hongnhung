@@ -35,17 +35,17 @@ const WEDDING_CONFIG = {
         "https://www.google.com/maps/search/?api=1&query=20.63713836669922,105.98127746582031",
     },
   },
-  stories: {
+   stories: {
     groom: {
       role: "Chú rể",
       text: "Anh từng nghĩ hạnh phúc còn xa lắm. Cho đến ngày gặp em.",
-      image: "./assets/img/story-optimized/groom.jpg",
+      image: "./assets/img/gallery-optimized/image8.jpg",
       imageAlt: "Chú rể Hoàng Vinh",
     },
     bride: {
       role: "Cô dâu",
       text: "Chỉ cần một người nắm tay em mỗi sáng thức dậy. Và người ấy, hóa ra, chính là anh.",
-      image: "./assets/img/story-optimized/bride.jpg",
+      image: "./assets/img/gallery-optimized/image8.jpg",
       imageAlt: "Cô dâu Nguyễn Nhung",
     },
   },
