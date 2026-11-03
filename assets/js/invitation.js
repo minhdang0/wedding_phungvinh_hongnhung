@@ -45,7 +45,7 @@ const WEDDING_CONFIG = {
     bride: {
       role: "Cô dâu",
       text: "Chỉ cần một người nắm tay em mỗi sáng thức dậy. Và người ấy, hóa ra, chính là anh.",
-      image: "./assets/img/gallery-optimized/image8.jpg",
+      image: "./assets/img/gallery-optimized/image10.jpg",
       imageAlt: "Cô dâu Nguyễn Nhung",
     },
   },
