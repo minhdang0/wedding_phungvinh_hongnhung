@@ -73,19 +73,24 @@ const WEDDING_CONFIG = {
       "./assets/img/gallery-optimized/image5.jpg",
       "./assets/img/gallery-optimized/image6.jpg",
       "./assets/img/gallery-optimized/image7.jpg",
-      "./assets/img/gallery-optimized/image8.jpg",
-      "./assets/img/gallery-optimized/image9.jpg",
-      "./assets/img/gallery-optimized/image10.jpg",
-      "./assets/img/gallery-optimized/image11.jpg",
-      "./assets/img/gallery-optimized/image12.jpg",
-      "./assets/img/gallery-optimized/image13.jpg",
-      "./assets/img/gallery-optimized/image14.jpg",
-      "./assets/img/gallery-optimized/image15.jpg",
-      "./assets/img/gallery-optimized/image16.jpg",
     ],
   },
   rsvpEndpoint:
     "https://script.google.com/macros/s/AKfycbxojB-5_Pcyp8hBP5q0hm64PLmEYidO4nokolSOIzcuagisBGbb2Dv4qsi7zhujJOo/exec",
+  gift: {
+    groom: {
+      holder: "PHUNG VAN VINH",
+      bank: "Vietcombank",
+      accountNumber: "0123456789",
+      qr: "./assets/img/qr/groom.jpg",
+    },
+    bride: {
+      holder: "NGUYEN PHUONG NHUNG",
+      bank: "Techcombank",
+      accountNumber: "9876543210",
+      qr: "./assets/img/qr/bride.jpg",
+    },
+  },
 };
 
 const toDate = (d) => new Date(d.year, d.month - 1, d.day, d.hour, d.minute);
@@ -315,7 +320,7 @@ function setupHeroSlideshow() {
 
   slides.forEach((slide) => {
     const image = slide.querySelector("img");
-    if (image?.decode) image.decode().catch(() => {});
+    if (image?.decode) image.decode().catch(() => { });
   });
 
   function next() {
@@ -393,12 +398,28 @@ function setupEnvelope() {
 
   let wasPlaying = false;
 
+  let resumeOnTouch = false;
+
+  function resumeMusic() {
+    if (!resumeOnTouch) return;
+    music.play().then(() => {
+      resumeOnTouch = false;
+      document.removeEventListener("touchstart", resumeMusic);
+      document.removeEventListener("click", resumeMusic);
+    }).catch(() => { });
+  }
+
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
       wasPlaying = !music.paused;
       music.pause();
     } else if (wasPlaying && invitationOpened) {
-      playMusic();
+      music.play().catch(() => {
+        // bị chặn: chờ lần chạm/cuộn tiếp theo rồi bật lại
+        resumeOnTouch = true;
+        document.addEventListener("touchstart", resumeMusic, { passive: true });
+        document.addEventListener("click", resumeMusic);
+      });
     }
   });
 
@@ -1425,7 +1446,140 @@ function setupCountdownNote() {
     });
   });
 }
+function setupGift() {
+  const modal = document.getElementById("giftModal");
+  const openBtn = document.getElementById("giftOpen");
+  const bills = document.querySelector(".gift-bills");
+  if (!modal || !openBtn) return;
 
+  const gift = WEDDING_CONFIG.gift || {};
+  const tabs = [...modal.querySelectorAll("[data-gift-tab]")];
+  const panels = [...modal.querySelectorAll("[data-gift-panel]")];
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  ["groom", "bride"].forEach((side) => {
+    const g = gift[side] || {};
+    const img = modal.querySelector(`[data-gift-qr="${side}"]`);
+    if (img && g.qr) {
+      img.src = g.qr;
+      img.alt = `Mã QR mừng cưới của ${side === "groom" ? "chú rể" : "cô dâu"}`;
+    }
+    setText(
+      `[data-gift-holder="${side}"]`,
+      g.holder || (side === "groom" ? WEDDING_CONFIG.groomName : WEDDING_CONFIG.brideName),
+    );
+    setText(`[data-gift-bank="${side}"]`, [g.bank, g.accountNumber].filter(Boolean).join(" · "));
+  });
+
+  function selectTab(side, focus) {
+    tabs.forEach((tab) => {
+      const on = tab.dataset.giftTab === side;
+      tab.setAttribute("aria-selected", String(on));
+      tab.tabIndex = on ? 0 : -1;
+      if (on && focus) tab.focus();
+    });
+    panels.forEach((panel) => {
+      panel.hidden = panel.dataset.giftPanel !== side;
+    });
+  }
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => selectTab(tab.dataset.giftTab));
+    tab.addEventListener("keydown", (e) => {
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      e.preventDefault();
+      selectTab(tab.dataset.giftTab === "groom" ? "bride" : "groom", true);
+    });
+  });
+
+  let lastFocus = null;
+  let prevOverflow = "";
+
+  function openModal() {
+    lastFocus = document.activeElement;
+    prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    selectTab("groom");
+    modal.hidden = false;
+    modal.querySelector("[data-gift-close]").focus();
+  }
+
+  function closeModal() {
+    modal.hidden = true;
+    document.body.style.overflow = prevOverflow;
+    lastFocus?.focus();
+  }
+
+  openBtn.addEventListener("click", openModal);
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal || e.target.closest("[data-gift-close]")) closeModal();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !modal.hidden) closeModal();
+  });
+
+  // tiền vàng rơi quanh phong bì, chỉ chạy khi đang nhìn thấy
+  if (reduce || !bills) return;
+  let visible = false;
+  new IntersectionObserver((entries) => {
+    visible = entries[0].isIntersecting;
+  }).observe(openBtn);
+
+  function spawnBill() {
+    const el = document.createElement("span");
+    el.className = "gift-bill";
+    el.textContent = "囍";
+    bills.append(el);
+    const drift = (Math.random() - 0.5) * 140;
+    const spin = (Math.random() - 0.5) * 360;
+    el.animate(
+      [
+        { transform: "translate(-50%, 0) rotate(0deg)", opacity: 0 },
+        { opacity: 1, offset: 0.15 },
+        { transform: `translate(calc(-50% + ${drift}px), 190px) rotate(${spin}deg)`, opacity: 0 },
+      ],
+      { duration: 1800 + Math.random() * 1000, easing: "ease-in" },
+    ).onfinish = () => el.remove();
+  }
+
+  setInterval(() => {
+    if (visible && !document.hidden && modal.hidden) spawnBill();
+  }, 800);
+}
+
+function setupGiftAnimation() {
+  if (!window.gsap || !window.ScrollTrigger) return;
+  const mm = gsap.matchMedia();
+  mm.add("(prefers-reduced-motion: no-preference)", () => {
+    const section = document.querySelector(".gift-section");
+    if (!section) return;
+
+    const items = [
+      section.querySelector(".gift-intro"),
+      section.querySelector(".gift-scene"),
+      section.querySelector(".gift-hint"),
+    ].filter(Boolean);
+
+    gsap.fromTo(
+      items,
+      { y: 30, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.8,
+        ease: "power2.out",
+        stagger: 0.15,
+        immediateRender: false,
+        clearProps: "transform,opacity",
+        scrollTrigger: {
+          trigger: section,
+          start: "top 90%",
+          once: true,
+        },
+      },
+    );
+  });
+}
 function safeRun(fn) {
   try {
     fn();
@@ -1440,6 +1594,7 @@ function safeRun(fn) {
   setupEnvelope,
   setupMapLinks,
   setupRsvp,
+  setupGift,
   prepareHeroIntro,
 ].forEach(safeRun);
 
@@ -1454,4 +1609,5 @@ function safeRun(fn) {
   setupCountdownAnimation,
   setupCountdownNote,
   setupRsvpAnimation,
+  setupGiftAnimation
 ].forEach(whenOpened);
