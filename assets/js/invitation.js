@@ -80,15 +80,15 @@ const WEDDING_CONFIG = {
   gift: {
     groom: {
       holder: "PHUNG VAN VINH",
-      bank: "Vietcombank",
-      accountNumber: "0123456789",
-      qr: "./assets/img/qr/groom.jpg",
+      bank: "VIB",
+      accountNumber: "044871214",
+      qr: "./assets/img/groom-qr.jpg",
     },
     bride: {
-      holder: "NGUYEN PHUONG NHUNG",
-      bank: "Techcombank",
-      accountNumber: "9876543210",
-      qr: "./assets/img/qr/bride.jpg",
+      holder: "NGUYEN THI NHUNG",
+      bank: "BIDV",
+      accountNumber: "1280750882",
+      qr: "./assets/img/bride-qr.jpg",
     },
   },
 };
