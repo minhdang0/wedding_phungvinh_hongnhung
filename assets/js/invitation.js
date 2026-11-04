@@ -35,7 +35,7 @@ const WEDDING_CONFIG = {
         "https://www.google.com/maps/search/?api=1&query=20.63713836669922,105.98127746582031",
     },
   },
-   stories: {
+  stories: {
     groom: {
       role: "Chú rể",
       text: "Anh từng nghĩ hạnh phúc còn xa lắm. Cho đến ngày gặp em.",
@@ -320,7 +320,7 @@ function setupHeroSlideshow() {
 
   slides.forEach((slide) => {
     const image = slide.querySelector("img");
-    if (image?.decode) image.decode().catch(() => { });
+    if (image?.decode) image.decode().catch(() => {});
   });
 
   function next() {
@@ -402,11 +402,14 @@ function setupEnvelope() {
 
   function resumeMusic() {
     if (!resumeOnTouch) return;
-    music.play().then(() => {
-      resumeOnTouch = false;
-      document.removeEventListener("touchstart", resumeMusic);
-      document.removeEventListener("click", resumeMusic);
-    }).catch(() => { });
+    music
+      .play()
+      .then(() => {
+        resumeOnTouch = false;
+        document.removeEventListener("touchstart", resumeMusic);
+        document.removeEventListener("click", resumeMusic);
+      })
+      .catch(() => {});
   }
 
   document.addEventListener("visibilitychange", () => {
@@ -1466,9 +1469,15 @@ function setupGift() {
     }
     setText(
       `[data-gift-holder="${side}"]`,
-      g.holder || (side === "groom" ? WEDDING_CONFIG.groomName : WEDDING_CONFIG.brideName),
+      g.holder ||
+        (side === "groom"
+          ? WEDDING_CONFIG.groomName
+          : WEDDING_CONFIG.brideName),
     );
-    setText(`[data-gift-bank="${side}"]`, [g.bank, g.accountNumber].filter(Boolean).join(" · "));
+    setText(
+      `[data-gift-bank="${side}"]`,
+      [g.bank, g.accountNumber].filter(Boolean).join(" · "),
+    );
   });
 
   function selectTab(side, focus) {
@@ -1512,7 +1521,8 @@ function setupGift() {
 
   openBtn.addEventListener("click", openModal);
   modal.addEventListener("click", (e) => {
-    if (e.target === modal || e.target.closest("[data-gift-close]")) closeModal();
+    if (e.target === modal || e.target.closest("[data-gift-close]"))
+      closeModal();
   });
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && !modal.hidden) closeModal();
@@ -1536,7 +1546,10 @@ function setupGift() {
       [
         { transform: "translate(-50%, 0) rotate(0deg)", opacity: 0 },
         { opacity: 1, offset: 0.15 },
-        { transform: `translate(calc(-50% + ${drift}px), 190px) rotate(${spin}deg)`, opacity: 0 },
+        {
+          transform: `translate(calc(-50% + ${drift}px), 190px) rotate(${spin}deg)`,
+          opacity: 0,
+        },
       ],
       { duration: 1800 + Math.random() * 1000, easing: "ease-in" },
     ).onfinish = () => el.remove();
@@ -1609,5 +1622,5 @@ function safeRun(fn) {
   setupCountdownAnimation,
   setupCountdownNote,
   setupRsvpAnimation,
-  setupGiftAnimation
+  setupGiftAnimation,
 ].forEach(whenOpened);
